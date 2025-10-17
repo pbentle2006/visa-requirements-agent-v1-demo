@@ -1,0 +1,16 @@
+{
+  "requirement_id": "",
+  "type": "functional|data|business_rule|validation",
+  "category": "",
+  "description": "",
+  "priority": "must_have|should_have|could_have",
+  "policy_reference": "",
+  "acceptance_criteria": [],
+  "dependencies": [],
+  "validation_rules": [],
+  "metadata": {
+    "created_by": "agent_name",
+    "timestamp": "",
+    "confidence_score": 0.0
+  }
+}

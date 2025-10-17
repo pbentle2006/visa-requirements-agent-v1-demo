@@ -1,0 +1,1059 @@
+{
+  "status": "completed",
+  "duration_seconds": 220.32,
+  "stages": [
+    {
+      "name": "policy_analysis",
+      "status": "completed",
+      "duration": 51.36,
+      "agent": "PolicyEvaluator"
+    },
+    {
+      "name": "requirements_capture",
+      "status": "completed",
+      "duration": 78.46,
+      "agent": "RequirementsCapture"
+    },
+    {
+      "name": "question_generation",
+      "status": "completed",
+      "duration": 117.8,
+      "agent": "QuestionGenerator"
+    },
+    {
+      "name": "validation",
+      "status": "completed",
+      "duration": 33.19,
+      "agent": "ValidationAgent"
+    },
+    {
+      "name": "consolidation",
+      "status": "completed",
+      "duration": 44.26,
+      "agent": "ConsolidationAgent"
+    }
+  ],
+  "outputs": {
+    "policy_structure": {
+      "visa_type": "Skilled Worker Visa",
+      "visa_code": "V4",
+      "objective": {
+        "primary_purpose": "Enable temporary entry for specific purposes",
+        "secondary_purposes": [
+          "family reunification",
+          "economic contribution",
+          "cultural exchange"
+        ]
+      },
+      "key_requirements": {
+        "location": "Must be outside country when applying",
+        "sponsorship": "Sponsorship required from eligible person",
+        "health": "Must meet health requirements",
+        "character": "Must meet character requirements",
+        "financial": "Must demonstrate financial capacity"
+      },
+      "stakeholders": [
+        "applicants",
+        "sponsors",
+        "dependents",
+        "employers"
+      ],
+      "scope": "Applications lodged on or after effective date",
+      "effective_date": "1 January 2024",
+      "version": "4.7"
+    },
+    "eligibility_rules": {
+      "applicant_requirements": [
+        {
+          "requirement": "Must be outside country",
+          "reference": "W2.5(a)(i)",
+          "mandatory": true
+        },
+        {
+          "requirement": "Must hold valid passport",
+          "reference": "V3.5(a)(ii)",
+          "mandatory": true
+        },
+        {
+          "requirement": "Must meet health requirements",
+          "reference": "V4.5(b)",
+          "mandatory": true
+        }
+      ],
+      "sponsor_requirements": [
+        {
+          "requirement": "Must be citizen or resident",
+          "reference": "V5.10(a)",
+          "mandatory": true
+        },
+        {
+          "requirement": "Must meet income threshold",
+          "reference": "V2.10(b)",
+          "mandatory": true
+        }
+      ],
+      "dependent_requirements": [
+        {
+          "requirement": "Must be under 18 years old",
+          "reference": "W1.15(a)",
+          "mandatory": true
+        }
+      ]
+    },
+    "conditions": {
+      "visa_conditions": [
+        "No work permitted",
+        "Must maintain health insurance",
+        "Must not engage in criminal activity"
+      ],
+      "financial_conditions": [
+        "Maintain access to $43000 funds",
+        "Provide evidence of financial support"
+      ],
+      "health_conditions": [
+        "Undergo medical examination",
+        "Maintain health insurance coverage"
+      ]
+    },
+    "functional_requirements": [
+      {
+        "requirement_id": "FR-001",
+        "description": "System must verify applicant location",
+        "category": "notification",
+        "priority": "could_have",
+        "policy_reference": "V5.13",
+        "acceptance_criteria": [
+          "System validates location correctly",
+          "Error handling for invalid location",
+          "Audit logging for location checks"
+        ]
+      },
+      {
+        "requirement_id": "FR-002",
+        "description": "System must validate passport details",
+        "category": "processing",
+        "priority": "should_have",
+        "policy_reference": "V5.31",
+        "acceptance_criteria": [
+          "System validates details correctly",
+          "Error handling for invalid details",
+          "Audit logging for details checks"
+        ]
+      },
+      {
+        "requirement_id": "FR-003",
+        "description": "System must check sponsor eligibility",
+        "category": "validation",
+        "priority": "must_have",
+        "policy_reference": "V1.39",
+        "acceptance_criteria": [
+          "System validates eligibility correctly",
+          "Error handling for invalid eligibility",
+          "Audit logging for eligibility checks"
+        ]
+      },
+      {
+        "requirement_id": "FR-004",
+        "description": "System must calculate income thresholds",
+        "category": "validation",
+        "priority": "could_have",
+        "policy_reference": "V3.20",
+        "acceptance_criteria": [
+          "System validates thresholds correctly",
+          "Error handling for invalid thresholds",
+          "Audit logging for thresholds checks"
+        ]
+      },
+      {
+        "requirement_id": "FR-005",
+        "description": "System must process health certificates",
+        "category": "processing",
+        "priority": "must_have",
+        "policy_reference": "W2.29",
+        "acceptance_criteria": [
+          "System validates certificates correctly",
+          "Error handling for invalid certificates",
+          "Audit logging for certificates checks"
+        ]
+      },
+      {
+        "requirement_id": "FR-006",
+        "description": "System must validate relationship evidence",
+        "category": "notification",
+        "priority": "should_have",
+        "policy_reference": "V4.35",
+        "acceptance_criteria": [
+          "System validates evidence correctly",
+          "Error handling for invalid evidence",
+          "Audit logging for evidence checks"
+        ]
+      },
+      {
+        "requirement_id": "FR-007",
+        "description": "System must generate decision recommendations",
+        "category": "validation",
+        "priority": "could_have",
+        "policy_reference": "F1.29",
+        "acceptance_criteria": [
+          "System validates recommendations correctly",
+          "Error handling for invalid recommendations",
+          "Audit logging for recommendations checks"
+        ]
+      },
+      {
+        "requirement_id": "FR-008",
+        "description": "System must track application status",
+        "category": "validation",
+        "priority": "could_have",
+        "policy_reference": "F1.37",
+        "acceptance_criteria": [
+          "System validates status correctly",
+          "Error handling for invalid status",
+          "Audit logging for status checks"
+        ]
+      }
+    ],
+    "data_requirements": [
+      {
+        "requirement_id": "DR-001",
+        "field_name": "applicant_name",
+        "data_type": "text",
+        "description": "Full legal name of applicant",
+        "required": true,
+        "validation": "Must be valid text",
+        "policy_reference": "S2.50"
+      },
+      {
+        "requirement_id": "DR-002",
+        "field_name": "date_of_birth",
+        "data_type": "date",
+        "description": "Date of birth",
+        "required": true,
+        "validation": "Must be valid date",
+        "policy_reference": "F2.18"
+      },
+      {
+        "requirement_id": "DR-003",
+        "field_name": "passport_number",
+        "data_type": "text",
+        "description": "Passport number",
+        "required": true,
+        "validation": "Must be valid text",
+        "policy_reference": "W2.5"
+      },
+      {
+        "requirement_id": "DR-004",
+        "field_name": "nationality",
+        "data_type": "text",
+        "description": "Country of citizenship",
+        "required": false,
+        "validation": "Must be valid text",
+        "policy_reference": "V3.40"
+      },
+      {
+        "requirement_id": "DR-005",
+        "field_name": "current_location",
+        "data_type": "text",
+        "description": "Current country of residence",
+        "required": false,
+        "validation": "Must be valid text",
+        "policy_reference": "F1.20"
+      },
+      {
+        "requirement_id": "DR-006",
+        "field_name": "sponsor_name",
+        "data_type": "text",
+        "description": "Name of sponsor",
+        "required": false,
+        "validation": "Must be valid text",
+        "policy_reference": "W1.12"
+      },
+      {
+        "requirement_id": "DR-007",
+        "field_name": "sponsor_income",
+        "data_type": "currency",
+        "description": "Annual income of sponsor",
+        "required": true,
+        "validation": "Must be valid currency",
+        "policy_reference": "V3.33"
+      },
+      {
+        "requirement_id": "DR-008",
+        "field_name": "relationship_type",
+        "data_type": "select",
+        "description": "Type of relationship to sponsor",
+        "required": true,
+        "validation": "Must be valid select",
+        "policy_reference": "S1.20"
+      },
+      {
+        "requirement_id": "DR-009",
+        "field_name": "intended_duration",
+        "data_type": "number",
+        "description": "Intended length of stay in days",
+        "required": true,
+        "validation": "Must be valid number",
+        "policy_reference": "W2.48"
+      }
+    ],
+    "business_rules": [
+      {
+        "rule_id": "BR-001",
+        "description": "Maximum 2 sponsors allowed",
+        "rule_type": "constraint",
+        "logic": "COUNT(sponsors) <= 2",
+        "policy_reference": "S1.33",
+        "parameters": {
+          "max_value": 2,
+          "threshold": null
+        }
+      },
+      {
+        "rule_id": "BR-002",
+        "description": "Sponsor can support max 6 parents",
+        "rule_type": "constraint",
+        "logic": "COUNT(sponsored_parents) <= 6",
+        "policy_reference": "V4.47",
+        "parameters": {
+          "max_value": 10,
+          "threshold": null
+        }
+      },
+      {
+        "rule_id": "BR-003",
+        "description": "Medical certificates valid 36 months",
+        "rule_type": "validation",
+        "logic": "certificate_date >= (current_date - 36 months)",
+        "policy_reference": "F2.44",
+        "parameters": {
+          "max_value": null,
+          "threshold": null
+        }
+      },
+      {
+        "rule_id": "BR-004",
+        "description": "Income threshold varies by family size",
+        "rule_type": "calculation",
+        "logic": "threshold = base_amount + (dependents * additional_amount)",
+        "policy_reference": "W2.16",
+        "parameters": {
+          "max_value": null,
+          "threshold": 82710
+        }
+      },
+      {
+        "rule_id": "BR-005",
+        "description": "Age validation for dependents",
+        "rule_type": "validation",
+        "logic": "dependent_age < 18",
+        "policy_reference": "W2.17",
+        "parameters": {
+          "max_value": null,
+          "threshold": null
+        }
+      },
+      {
+        "rule_id": "BR-006",
+        "description": "Passport validity requirement",
+        "rule_type": "validation",
+        "logic": "passport_expiry > (application_date + 6 months)",
+        "policy_reference": "V3.37",
+        "parameters": {
+          "max_value": null,
+          "threshold": null
+        }
+      }
+    ],
+    "validation_rules": [
+      {
+        "validation_id": "VR-001",
+        "field": "applicant_age",
+        "validation_type": "range",
+        "rule": "Age must be between 18 and 65",
+        "error_message": "Age must be between 18 and 65 years",
+        "policy_reference": "S2.30"
+      },
+      {
+        "validation_id": "VR-002",
+        "field": "passport_expiry",
+        "validation_type": "date",
+        "rule": "Passport must be valid for 6+ months",
+        "error_message": "Passport expires too soon",
+        "policy_reference": "V4.24"
+      },
+      {
+        "validation_id": "VR-003",
+        "field": "income_amount",
+        "validation_type": "currency",
+        "rule": "Income must meet threshold",
+        "error_message": "Income below required threshold",
+        "policy_reference": "V3.28"
+      },
+      {
+        "validation_id": "VR-004",
+        "field": "relationship_duration",
+        "validation_type": "number",
+        "rule": "Relationship must be 12+ months",
+        "error_message": "Relationship duration too short",
+        "policy_reference": "S1.27"
+      },
+      {
+        "validation_id": "VR-005",
+        "field": "health_certificate_date",
+        "validation_type": "date",
+        "rule": "Certificate must be within 36 months",
+        "error_message": "Health certificate expired",
+        "policy_reference": "F2.22"
+      }
+    ],
+    "application_questions": [
+      {
+        "question_id": "Q_APPL_001",
+        "section": "Applicant Details",
+        "question_text": "What is your full legal name?",
+        "input_type": "text",
+        "required": true,
+        "validation": {
+          "rules": [
+            "required"
+          ],
+          "error_messages": {
+            "required": "This field is required"
+          }
+        },
+        "help_text": "Enter name as shown on passport",
+        "policy_reference": "S2.46",
+        "options": null
+      },
+      {
+        "question_id": "Q_APPL_002",
+        "section": "Applicant Details",
+        "question_text": "What is your date of birth?",
+        "input_type": "date",
+        "required": true,
+        "validation": {
+          "rules": [
+            "required"
+          ],
+          "error_messages": {
+            "required": "This field is required"
+          }
+        },
+        "help_text": "DD/MM/YYYY format",
+        "policy_reference": "W2.47",
+        "options": null
+      },
+      {
+        "question_id": "Q_APPL_003",
+        "section": "Applicant Details",
+        "question_text": "What is your passport number?",
+        "input_type": "text",
+        "required": true,
+        "validation": {
+          "rules": [
+            "required"
+          ],
+          "error_messages": {
+            "required": "This field is required"
+          }
+        },
+        "help_text": "Enter passport number",
+        "policy_reference": "F2.44",
+        "options": null
+      },
+      {
+        "question_id": "Q_APPL_004",
+        "section": "Applicant Details",
+        "question_text": "Are you currently in the country?",
+        "input_type": "boolean",
+        "required": true,
+        "validation": {
+          "rules": [
+            "required"
+          ],
+          "error_messages": {
+            "required": "This field is required"
+          }
+        },
+        "help_text": "You must be outside the country to apply",
+        "policy_reference": "V5.49",
+        "options": null
+      },
+      {
+        "question_id": "Q_SPON_005",
+        "section": "Sponsorship",
+        "question_text": "Who is your sponsor?",
+        "input_type": "text",
+        "required": true,
+        "validation": {
+          "rules": [
+            "required"
+          ],
+          "error_messages": {
+            "required": "This field is required"
+          }
+        },
+        "help_text": "Full name of sponsor",
+        "policy_reference": "W1.8",
+        "options": null
+      },
+      {
+        "question_id": "Q_SPON_006",
+        "section": "Sponsorship",
+        "question_text": "How many sponsors do you have?",
+        "input_type": "number",
+        "required": true,
+        "validation": {
+          "rules": [
+            "required"
+          ],
+          "error_messages": {
+            "required": "This field is required"
+          }
+        },
+        "help_text": "Maximum 2 sponsors allowed",
+        "policy_reference": "V2.16",
+        "options": null
+      },
+      {
+        "question_id": "Q_SPON_007",
+        "section": "Sponsorship",
+        "question_text": "What is your relationship to the sponsor?",
+        "input_type": "select",
+        "required": true,
+        "validation": {
+          "rules": [
+            "required"
+          ],
+          "error_messages": {
+            "required": "This field is required"
+          }
+        },
+        "help_text": "Select relationship type",
+        "policy_reference": "F2.40",
+        "options": [
+          "Parent",
+          "Partner",
+          "Child"
+        ]
+      },
+      {
+        "question_id": "Q_FINA_008",
+        "section": "Financial",
+        "question_text": "What is the sponsor's annual income?",
+        "input_type": "currency",
+        "required": true,
+        "validation": {
+          "rules": [
+            "required"
+          ],
+          "error_messages": {
+            "required": "This field is required"
+          }
+        },
+        "help_text": "Income for last tax year",
+        "policy_reference": "V5.5",
+        "options": null
+      },
+      {
+        "question_id": "Q_FINA_009",
+        "section": "Financial",
+        "question_text": "How much maintenance funds do you have?",
+        "input_type": "currency",
+        "required": true,
+        "validation": {
+          "rules": [
+            "required"
+          ],
+          "error_messages": {
+            "required": "This field is required"
+          }
+        },
+        "help_text": "Minimum $10,000 required",
+        "policy_reference": "F1.50",
+        "options": null
+      },
+      {
+        "question_id": "Q_HEAL_010",
+        "section": "Health & Character",
+        "question_text": "When was your medical certificate issued?",
+        "input_type": "date",
+        "required": true,
+        "validation": {
+          "rules": [
+            "required"
+          ],
+          "error_messages": {
+            "required": "This field is required"
+          }
+        },
+        "help_text": "Must be within 36 months",
+        "policy_reference": "V4.22",
+        "options": null
+      },
+      {
+        "question_id": "Q_HEAL_011",
+        "section": "Health & Character",
+        "question_text": "Do you have health insurance?",
+        "input_type": "boolean",
+        "required": true,
+        "validation": {
+          "rules": [
+            "required"
+          ],
+          "error_messages": {
+            "required": "This field is required"
+          }
+        },
+        "help_text": "Minimum $200,000 coverage required",
+        "policy_reference": "V3.49",
+        "options": null
+      }
+    ],
+    "conditional_logic": {
+      "Q_APPL_004": {
+        "triggers": [
+          "decline_application"
+        ],
+        "condition": "if answer is 'Yes', decline application"
+      },
+      "Q_SPON_002": {
+        "triggers": [
+          "calculate_income_threshold"
+        ],
+        "affects": [
+          "Q_FINA_001"
+        ]
+      }
+    },
+    "validation_report": {
+      "overall_score": 93.2,
+      "requirement_validation": {
+        "total_requirements": 49,
+        "valid_requirements": 47,
+        "invalid_requirements": 2,
+        "validation_rate": 95.9,
+        "errors": [
+          {
+            "requirement_id": "FR-023",
+            "errors": [
+              "Missing policy_reference"
+            ]
+          },
+          {
+            "requirement_id": "DR-015",
+            "errors": [
+              "Invalid data_type"
+            ]
+          }
+        ]
+      },
+      "question_validation": {
+        "total_questions": 21,
+        "valid_questions": 19,
+        "invalid_questions": 2,
+        "validation_rate": 90.5,
+        "errors": [
+          {
+            "question_id": "Q_HEAL_002",
+            "errors": [
+              "Missing validation rules"
+            ]
+          }
+        ]
+      },
+      "consistency_check": {
+        "consistent": false,
+        "inconsistencies": []
+      }
+    },
+    "gap_analysis": {
+      "missing_requirements": [
+        "No requirement for partnership duration validation",
+        "Missing validation for dependent age limits"
+      ],
+      "missing_questions": [
+        "No question about insurance provider approval",
+        "Missing question about previous visa history"
+      ],
+      "uncovered_policy_sections": [
+        "S2.40(a)(ii)"
+      ]
+    },
+    "recommendations": [
+      {
+        "priority": "high",
+        "category": "requirements",
+        "description": "Fix invalid requirements",
+        "action": "Add missing policy references and correct data types"
+      },
+      {
+        "priority": "medium",
+        "category": "coverage",
+        "description": "Improve policy coverage",
+        "action": "Add requirements for uncovered policy sections"
+      }
+    ],
+    "consolidated_spec": {
+      "executive_summary": "Complete specification for automated visa application processing system",
+      "system_overview": {
+        "purpose": "Automate visa application processing and validation",
+        "scope": "End-to-end application workflow",
+        "stakeholders": [
+          "applicants",
+          "sponsors",
+          "case officers",
+          "system administrators"
+        ]
+      },
+      "architecture": {
+        "pattern": "Multi-tier web application",
+        "components": [
+          "Web UI",
+          "API Layer",
+          "Business Logic",
+          "Database",
+          "Integration Layer"
+        ],
+        "technologies": [
+          "React",
+          "Node.js",
+          "PostgreSQL",
+          "REST APIs"
+        ]
+      }
+    },
+    "implementation_guide": {
+      "phases": [
+        {
+          "phase": "Foundation",
+          "duration": "4 weeks",
+          "deliverables": [
+            "Database schema",
+            "API framework",
+            "Authentication"
+          ]
+        },
+        {
+          "phase": "Core Features",
+          "duration": "8 weeks",
+          "deliverables": [
+            "Application forms",
+            "Validation engine",
+            "Workflow engine"
+          ]
+        },
+        {
+          "phase": "Integration",
+          "duration": "4 weeks",
+          "deliverables": [
+            "External integrations",
+            "Reporting",
+            "Testing"
+          ]
+        }
+      ],
+      "database_schema": {
+        "tables": [
+          "applications",
+          "applicants",
+          "sponsors",
+          "documents",
+          "validations"
+        ],
+        "relationships": "Normalized relational design"
+      },
+      "api_endpoints": [
+        "POST /api/applications",
+        "GET /api/applications/{id}",
+        "PUT /api/applications/{id}/validate",
+        "GET /api/requirements"
+      ]
+    },
+    "traceability_matrix": [
+      {
+        "policy_reference": "W2.7",
+        "requirement_id": "FR-001",
+        "requirement_type": "functional",
+        "requirement_description": "Sample requirement 1",
+        "related_questions": [
+          "Q_SECT_001",
+          "Q_SECT_002",
+          "Q_SECT_003"
+        ],
+        "coverage": "partial"
+      },
+      {
+        "policy_reference": "V1.27",
+        "requirement_id": "FR-002",
+        "requirement_type": "business_rule",
+        "requirement_description": "Sample requirement 2",
+        "related_questions": [
+          "Q_SECT_001",
+          "Q_SECT_002"
+        ],
+        "coverage": "partial"
+      },
+      {
+        "policy_reference": "W1.9",
+        "requirement_id": "FR-003",
+        "requirement_type": "data",
+        "requirement_description": "Sample requirement 3",
+        "related_questions": [
+          "Q_SECT_001",
+          "Q_SECT_002",
+          "Q_SECT_003"
+        ],
+        "coverage": "full"
+      },
+      {
+        "policy_reference": "V3.19",
+        "requirement_id": "FR-004",
+        "requirement_type": "business_rule",
+        "requirement_description": "Sample requirement 4",
+        "related_questions": [
+          "Q_SECT_001",
+          "Q_SECT_002",
+          "Q_SECT_003"
+        ],
+        "coverage": "full"
+      },
+      {
+        "policy_reference": "V4.31",
+        "requirement_id": "FR-005",
+        "requirement_type": "business_rule",
+        "requirement_description": "Sample requirement 5",
+        "related_questions": [
+          "Q_SECT_001"
+        ],
+        "coverage": "full"
+      },
+      {
+        "policy_reference": "F2.40",
+        "requirement_id": "FR-006",
+        "requirement_type": "business_rule",
+        "requirement_description": "Sample requirement 6",
+        "related_questions": [
+          "Q_SECT_001"
+        ],
+        "coverage": "none"
+      },
+      {
+        "policy_reference": "V4.11",
+        "requirement_id": "FR-007",
+        "requirement_type": "business_rule",
+        "requirement_description": "Sample requirement 7",
+        "related_questions": [
+          "Q_SECT_001",
+          "Q_SECT_002"
+        ],
+        "coverage": "full"
+      },
+      {
+        "policy_reference": "V4.34",
+        "requirement_id": "FR-008",
+        "requirement_type": "data",
+        "requirement_description": "Sample requirement 8",
+        "related_questions": [
+          "Q_SECT_001",
+          "Q_SECT_002",
+          "Q_SECT_003"
+        ],
+        "coverage": "full"
+      },
+      {
+        "policy_reference": "F1.18",
+        "requirement_id": "FR-009",
+        "requirement_type": "business_rule",
+        "requirement_description": "Sample requirement 9",
+        "related_questions": [
+          "Q_SECT_001"
+        ],
+        "coverage": "full"
+      },
+      {
+        "policy_reference": "F1.10",
+        "requirement_id": "FR-010",
+        "requirement_type": "validation",
+        "requirement_description": "Sample requirement 10",
+        "related_questions": [
+          "Q_SECT_001",
+          "Q_SECT_002"
+        ],
+        "coverage": "none"
+      },
+      {
+        "policy_reference": "S2.38",
+        "requirement_id": "FR-011",
+        "requirement_type": "functional",
+        "requirement_description": "Sample requirement 11",
+        "related_questions": [
+          "Q_SECT_001"
+        ],
+        "coverage": "partial"
+      },
+      {
+        "policy_reference": "S1.33",
+        "requirement_id": "FR-012",
+        "requirement_type": "functional",
+        "requirement_description": "Sample requirement 12",
+        "related_questions": [
+          "Q_SECT_001",
+          "Q_SECT_002",
+          "Q_SECT_003"
+        ],
+        "coverage": "partial"
+      },
+      {
+        "policy_reference": "F2.38",
+        "requirement_id": "FR-013",
+        "requirement_type": "business_rule",
+        "requirement_description": "Sample requirement 13",
+        "related_questions": [
+          "Q_SECT_001",
+          "Q_SECT_002",
+          "Q_SECT_003"
+        ],
+        "coverage": "partial"
+      },
+      {
+        "policy_reference": "V2.45",
+        "requirement_id": "FR-014",
+        "requirement_type": "data",
+        "requirement_description": "Sample requirement 14",
+        "related_questions": [
+          "Q_SECT_001",
+          "Q_SECT_002"
+        ],
+        "coverage": "partial"
+      },
+      {
+        "policy_reference": "S1.41",
+        "requirement_id": "FR-015",
+        "requirement_type": "functional",
+        "requirement_description": "Sample requirement 15",
+        "related_questions": [
+          "Q_SECT_001"
+        ],
+        "coverage": "full"
+      },
+      {
+        "policy_reference": "V2.15",
+        "requirement_id": "FR-016",
+        "requirement_type": "functional",
+        "requirement_description": "Sample requirement 16",
+        "related_questions": [
+          "Q_SECT_001"
+        ],
+        "coverage": "full"
+      },
+      {
+        "policy_reference": "V3.27",
+        "requirement_id": "FR-017",
+        "requirement_type": "functional",
+        "requirement_description": "Sample requirement 17",
+        "related_questions": [
+          "Q_SECT_001",
+          "Q_SECT_002"
+        ],
+        "coverage": "none"
+      },
+      {
+        "policy_reference": "V3.21",
+        "requirement_id": "FR-018",
+        "requirement_type": "business_rule",
+        "requirement_description": "Sample requirement 18",
+        "related_questions": [
+          "Q_SECT_001"
+        ],
+        "coverage": "none"
+      },
+      {
+        "policy_reference": "V4.23",
+        "requirement_id": "FR-019",
+        "requirement_type": "validation",
+        "requirement_description": "Sample requirement 19",
+        "related_questions": [
+          "Q_SECT_001",
+          "Q_SECT_002"
+        ],
+        "coverage": "partial"
+      },
+      {
+        "policy_reference": "V4.26",
+        "requirement_id": "FR-020",
+        "requirement_type": "data",
+        "requirement_description": "Sample requirement 20",
+        "related_questions": [
+          "Q_SECT_001",
+          "Q_SECT_002",
+          "Q_SECT_003"
+        ],
+        "coverage": "none"
+      },
+      {
+        "policy_reference": "V4.13",
+        "requirement_id": "FR-021",
+        "requirement_type": "business_rule",
+        "requirement_description": "Sample requirement 21",
+        "related_questions": [
+          "Q_SECT_001",
+          "Q_SECT_002"
+        ],
+        "coverage": "full"
+      },
+      {
+        "policy_reference": "V3.19",
+        "requirement_id": "FR-022",
+        "requirement_type": "data",
+        "requirement_description": "Sample requirement 22",
+        "related_questions": [
+          "Q_SECT_001",
+          "Q_SECT_002",
+          "Q_SECT_003"
+        ],
+        "coverage": "none"
+      },
+      {
+        "policy_reference": "W1.48",
+        "requirement_id": "FR-023",
+        "requirement_type": "data",
+        "requirement_description": "Sample requirement 23",
+        "related_questions": [
+          "Q_SECT_001"
+        ],
+        "coverage": "full"
+      },
+      {
+        "policy_reference": "V1.7",
+        "requirement_id": "FR-024",
+        "requirement_type": "business_rule",
+        "requirement_description": "Sample requirement 24",
+        "related_questions": [
+          "Q_SECT_001",
+          "Q_SECT_002"
+        ],
+        "coverage": "none"
+      }
+    ],
+    "summary_statistics": {
+      "total_requirements": 44,
+      "requirements_by_type": {
+        "functional": 15,
+        "data": 19,
+        "business_rules": 11,
+        "validation": 10
+      },
+      "total_questions": 31,
+      "questions_by_section": {
+        "Applicant Details": 8,
+        "Sponsorship": 3,
+        "Financial": 4,
+        "Health & Character": 5
+      },
+      "validation_score": 93.5,
+      "policy_coverage": 97.9,
+      "processing_time": 223.0
+    }
+  }
+}

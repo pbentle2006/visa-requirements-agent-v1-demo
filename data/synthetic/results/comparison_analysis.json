@@ -1,0 +1,116 @@
+{
+  "generated_at": "2025-10-10T18:10:00.348112",
+  "visa_types_compared": 4,
+  "metrics_comparison": {
+    "tourist_visa": {
+      "total_requirements": 57,
+      "total_questions": 34,
+      "validation_score": 91.9,
+      "policy_coverage": 93.9,
+      "processing_time": 239.7,
+      "requirements_by_type": {
+        "functional": 21,
+        "data": 17,
+        "business_rules": 8,
+        "validation": 7
+      },
+      "questions_by_section": {
+        "Applicant Details": 5,
+        "Sponsorship": 6,
+        "Financial": 3,
+        "Health & Character": 5
+      }
+    },
+    "skilled_worker_visa": {
+      "total_requirements": 44,
+      "total_questions": 31,
+      "validation_score": 93.5,
+      "policy_coverage": 97.9,
+      "processing_time": 223.0,
+      "requirements_by_type": {
+        "functional": 15,
+        "data": 19,
+        "business_rules": 11,
+        "validation": 10
+      },
+      "questions_by_section": {
+        "Applicant Details": 8,
+        "Sponsorship": 3,
+        "Financial": 4,
+        "Health & Character": 5
+      }
+    },
+    "student_visa": {
+      "total_requirements": 43,
+      "total_questions": 25,
+      "validation_score": 85.8,
+      "policy_coverage": 92.1,
+      "processing_time": 202.3,
+      "requirements_by_type": {
+        "functional": 17,
+        "data": 19,
+        "business_rules": 9,
+        "validation": 6
+      },
+      "questions_by_section": {
+        "Applicant Details": 5,
+        "Sponsorship": 6,
+        "Financial": 2,
+        "Health & Character": 4
+      }
+    },
+    "family_reunion_visa": {
+      "total_requirements": 44,
+      "total_questions": 28,
+      "validation_score": 87.3,
+      "policy_coverage": 97.1,
+      "processing_time": 212.3,
+      "requirements_by_type": {
+        "functional": 16,
+        "data": 19,
+        "business_rules": 11,
+        "validation": 6
+      },
+      "questions_by_section": {
+        "Applicant Details": 6,
+        "Sponsorship": 6,
+        "Financial": 2,
+        "Health & Character": 5
+      }
+    }
+  },
+  "complexity_analysis": {
+    "complexity_scores": {
+      "tourist_visa": 31.12,
+      "skilled_worker_visa": 25.81,
+      "student_visa": 26.21,
+      "family_reunion_visa": 26.86
+    },
+    "most_complex": [
+      "tourist_visa",
+      31.12
+    ],
+    "least_complex": [
+      "skilled_worker_visa",
+      25.81
+    ],
+    "average_complexity": 27.5
+  },
+  "coverage_analysis": {
+    "coverage_by_type": {
+      "tourist_visa": 93.9,
+      "skilled_worker_visa": 97.9,
+      "student_visa": 92.1,
+      "family_reunion_visa": 97.1
+    },
+    "highest_coverage": [
+      "skilled_worker_visa",
+      97.9
+    ],
+    "lowest_coverage": [
+      "student_visa",
+      92.1
+    ],
+    "average_coverage": 95.25
+  }
+}

@@ -1,0 +1,23 @@
+{
+  "question_id": "",
+  "section": "",
+  "question_text": "",
+  "input_type": "text|number|boolean|date|select|multiselect|file",
+  "required": true,
+  "validation": {
+    "rules": [],
+    "error_messages": {}
+  },
+  "conditional_logic": {
+    "show_if": [],
+    "triggers": []
+  },
+  "help_text": "",
+  "policy_reference": "",
+  "options": [],
+  "metadata": {
+    "created_by": "agent_name",
+    "timestamp": "",
+    "confidence_score": 0.0
+  }
+}

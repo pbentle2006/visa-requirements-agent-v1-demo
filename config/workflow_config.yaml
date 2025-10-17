@@ -1,0 +1,50 @@
+workflow:
+  name: "Visa Requirements Workflow"
+  description: "End-to-end workflow for visa requirements capture and validation"
+  
+  stages:
+    - name: "policy_analysis"
+      agents: ["policy_evaluator"]
+      parallel: false
+      outputs:
+        - policy_structure
+        - eligibility_rules
+        - conditions
+      
+    - name: "requirements_capture"
+      agents: ["requirements_capture"]
+      parallel: false
+      depends_on: ["policy_analysis"]
+      outputs:
+        - functional_requirements
+        - data_requirements
+        - business_rules
+      
+    - name: "question_generation"
+      agents: ["question_generator"]
+      parallel: true
+      depends_on: ["policy_analysis", "requirements_capture"]
+      outputs:
+        - application_questions
+        - validation_rules
+      
+    - name: "validation"
+      agents: ["validation_agent"]
+      parallel: false
+      depends_on: ["policy_analysis", "requirements_capture", "question_generation"]
+      outputs:
+        - validation_report
+        - gap_analysis
+      
+    - name: "consolidation"
+      agents: ["consolidation_agent"]
+      parallel: false
+      depends_on: ["policy_analysis", "requirements_capture", "question_generation", "validation"]
+      outputs:
+        - consolidated_spec
+        - implementation_guide
+
+execution:
+  timeout_per_stage: 300  # seconds
+  save_intermediate_results: true
+  continue_on_error: false

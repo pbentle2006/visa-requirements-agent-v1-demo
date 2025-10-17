@@ -1,0 +1,41 @@
+llm:
+  provider: openai
+  model: gpt-3.5-turbo
+  temperature: 0.1
+  max_tokens: 2000
+
+agents:
+  policy_evaluator:
+    name: "Policy Evaluator"
+    description: "Analyzes immigration policy documents and extracts structured information"
+    temperature: 0.1
+    max_retries: 3
+    
+  requirements_capture:
+    name: "Requirements Capture"
+    description: "Extracts and categorizes business and technical requirements"
+    temperature: 0.2
+    max_retries: 3
+    
+  question_generator:
+    name: "Question Generator"
+    description: "Generates application form questions with validation rules"
+    temperature: 0.3
+    max_retries: 3
+    
+  validation_agent:
+    name: "Validation Agent"
+    description: "Validates requirements against policy and technical constraints"
+    temperature: 0.1
+    max_retries: 3
+    
+  consolidation_agent:
+    name: "Consolidation Agent"
+    description: "Synthesizes all outputs into cohesive specification"
+    temperature: 0.2
+    max_retries: 3
+
+output:
+  format: json
+  include_metadata: true
+  include_policy_references: true
