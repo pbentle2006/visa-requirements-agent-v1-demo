@@ -19,6 +19,17 @@ def show_human_validation_workflow(workflow_results: Dict[str, Any]):
     
     if not workflow_results:
         st.warning("⚠️ No workflow results available. Please run the main workflow first.")
+        st.markdown("### 🚀 Quick Start")
+        st.markdown("1. Navigate to **Workflow Analysis** tab")
+        st.markdown("2. Upload the Parent Boost Visitor Visa policy document")
+        st.markdown("3. Click **Run Complete Workflow** (demo mode)")
+        st.markdown("4. Return here to start the validation process")
+        
+        # Provide demo data button for testing
+        if st.button("🎭 Load Demo Data for Testing", type="primary"):
+            st.session_state.workflow_results = generate_demo_workflow_results()
+            st.success("✅ Demo data loaded! Validation workflow is now available.")
+            st.rerun()
         return
     
     # Initialize session state for validation workflow
@@ -554,3 +565,343 @@ def generate_validation_report(workflow_results: Dict[str, Any]):
 def export_final_configuration(workflow_results: Dict[str, Any]):
     """Export final configuration for deployment."""
     st.success("📤 Final configuration exported (demo functionality)")
+
+def generate_demo_workflow_results() -> Dict[str, Any]:
+    """Generate comprehensive demo workflow results for validation testing."""
+    return {
+        'policy_evaluation': {
+            'policy_structure': {
+                'visa_type': 'Parent Boost Visitor Visa',
+                'visa_code': 'V4',
+                'objectives': [
+                    'Enable parents to visit their children in New Zealand',
+                    'Facilitate family reunification for temporary visits',
+                    'Support tourism and family connections'
+                ],
+                'key_requirements': [
+                    'Sponsorship by New Zealand resident child',
+                    'Financial support guarantee',
+                    'Health and character requirements',
+                    'Genuine temporary visit intention'
+                ]
+            },
+            'eligibility_rules': [
+                {
+                    'id': 'ER-001',
+                    'description': 'Applicant must be parent of New Zealand resident',
+                    'mandatory': True,
+                    'policy_reference': 'Section 3.1'
+                },
+                {
+                    'id': 'ER-002', 
+                    'description': 'Sponsor must be New Zealand resident for 12+ months',
+                    'mandatory': True,
+                    'policy_reference': 'Section 3.2'
+                },
+                {
+                    'id': 'ER-003',
+                    'description': 'Financial support guarantee required',
+                    'mandatory': True,
+                    'policy_reference': 'Section 4.1'
+                }
+            ]
+        },
+        'requirements_capture': {
+            'functional_requirements': [
+                {
+                    'id': 'FR-001',
+                    'description': 'System must verify parent-child relationship',
+                    'priority': 'High',
+                    'mandatory': True,
+                    'acceptance_criteria': [
+                        'Birth certificate verification',
+                        'Legal adoption documentation',
+                        'DNA testing if required'
+                    ]
+                },
+                {
+                    'id': 'FR-002',
+                    'description': 'System must validate sponsor residency status',
+                    'priority': 'High',
+                    'mandatory': True,
+                    'acceptance_criteria': [
+                        'Residency permit verification',
+                        '12-month residency history check',
+                        'Current address validation'
+                    ]
+                },
+                {
+                    'id': 'FR-003',
+                    'description': 'System must assess financial capacity',
+                    'priority': 'High',
+                    'mandatory': True,
+                    'acceptance_criteria': [
+                        'Income verification',
+                        'Bank statement analysis',
+                        'Support guarantee documentation'
+                    ]
+                },
+                {
+                    'id': 'FR-004',
+                    'description': 'System must process health assessments',
+                    'priority': 'Medium',
+                    'mandatory': True,
+                    'acceptance_criteria': [
+                        'Medical examination results',
+                        'Vaccination records',
+                        'Health insurance coverage'
+                    ]
+                }
+            ],
+            'data_requirements': [
+                {
+                    'id': 'DR-001',
+                    'description': 'Applicant personal information',
+                    'data_type': 'Personal',
+                    'mandatory': True,
+                    'fields': ['Full name', 'Date of birth', 'Nationality', 'Passport details']
+                },
+                {
+                    'id': 'DR-002',
+                    'description': 'Sponsor information and documentation',
+                    'data_type': 'Sponsor',
+                    'mandatory': True,
+                    'fields': ['Sponsor details', 'Residency status', 'Financial information']
+                },
+                {
+                    'id': 'DR-003',
+                    'description': 'Relationship evidence',
+                    'data_type': 'Relationship',
+                    'mandatory': True,
+                    'fields': ['Birth certificates', 'Family photos', 'Communication records']
+                },
+                {
+                    'id': 'DR-004',
+                    'description': 'Visit purpose and duration',
+                    'data_type': 'Visit',
+                    'mandatory': True,
+                    'fields': ['Visit purpose', 'Intended duration', 'Accommodation details']
+                },
+                {
+                    'id': 'DR-005',
+                    'description': 'Health and character documentation',
+                    'data_type': 'Compliance',
+                    'mandatory': True,
+                    'fields': ['Medical certificates', 'Police clearances', 'Character references']
+                }
+            ],
+            'business_rules': [
+                {
+                    'id': 'BR-001',
+                    'description': 'Maximum visit duration is 18 months',
+                    'rule_type': 'Duration',
+                    'enforcement': 'System validation'
+                },
+                {
+                    'id': 'BR-002',
+                    'description': 'Sponsor income must meet minimum threshold',
+                    'rule_type': 'Financial',
+                    'enforcement': 'Manual review'
+                },
+                {
+                    'id': 'BR-003',
+                    'description': 'Health examination required for applicants over 65',
+                    'rule_type': 'Health',
+                    'enforcement': 'Conditional requirement'
+                },
+                {
+                    'id': 'BR-004',
+                    'description': 'Character assessment required for all applicants',
+                    'rule_type': 'Character',
+                    'enforcement': 'Mandatory check'
+                },
+                {
+                    'id': 'BR-005',
+                    'description': 'Application processing fee must be paid upfront',
+                    'rule_type': 'Payment',
+                    'enforcement': 'System validation'
+                }
+            ],
+            'validation_rules': [
+                {
+                    'id': 'VR-001',
+                    'description': 'Passport must be valid for 6+ months',
+                    'field': 'passport_expiry',
+                    'validation_type': 'Date validation'
+                },
+                {
+                    'id': 'VR-002',
+                    'description': 'Email address must be valid format',
+                    'field': 'email',
+                    'validation_type': 'Format validation'
+                },
+                {
+                    'id': 'VR-003',
+                    'description': 'Phone number must include country code',
+                    'field': 'phone',
+                    'validation_type': 'Format validation'
+                },
+                {
+                    'id': 'VR-004',
+                    'description': 'Financial documents must be recent (3 months)',
+                    'field': 'financial_docs',
+                    'validation_type': 'Date validation'
+                },
+                {
+                    'id': 'VR-005',
+                    'description': 'Medical certificates must be from approved providers',
+                    'field': 'medical_certs',
+                    'validation_type': 'Provider validation'
+                },
+                {
+                    'id': 'VR-006',
+                    'description': 'All mandatory fields must be completed',
+                    'field': 'all_fields',
+                    'validation_type': 'Completeness check'
+                }
+            ]
+        },
+        'question_generation': {
+            'questions': [
+                {
+                    'id': 'Q001',
+                    'section': 'Applicant Details',
+                    'question': 'What is your full name as shown on your passport?',
+                    'type': 'text',
+                    'required': True,
+                    'validation_rules': ['Minimum length 2 characters', 'Must match passport'],
+                    'help_text': 'Enter your complete legal name exactly as it appears on your passport'
+                },
+                {
+                    'id': 'Q002',
+                    'section': 'Applicant Details',
+                    'question': 'What is your date of birth?',
+                    'type': 'date',
+                    'required': True,
+                    'validation_rules': ['Must be in the past', 'Must match passport'],
+                    'help_text': 'Select your date of birth as shown on official documents'
+                },
+                {
+                    'id': 'Q003',
+                    'section': 'Applicant Details',
+                    'question': 'What is your current nationality?',
+                    'type': 'select',
+                    'required': True,
+                    'options': ['Australian', 'British', 'Chinese', 'Indian', 'Other'],
+                    'help_text': 'Select your current citizenship/nationality'
+                },
+                {
+                    'id': 'Q004',
+                    'section': 'Applicant Details',
+                    'question': 'What is your passport number?',
+                    'type': 'text',
+                    'required': True,
+                    'validation_rules': ['Alphanumeric format', 'Valid passport format'],
+                    'help_text': 'Enter your current valid passport number'
+                },
+                {
+                    'id': 'Q005',
+                    'section': 'Sponsor Information',
+                    'question': 'What is your sponsor\'s full name?',
+                    'type': 'text',
+                    'required': True,
+                    'validation_rules': ['Minimum length 2 characters'],
+                    'help_text': 'Enter the full legal name of your New Zealand resident child'
+                },
+                {
+                    'id': 'Q006',
+                    'section': 'Sponsor Information',
+                    'question': 'What is your relationship to the sponsor?',
+                    'type': 'select',
+                    'required': True,
+                    'options': ['Parent', 'Step-parent', 'Adoptive parent'],
+                    'help_text': 'Select your relationship to the sponsor'
+                },
+                {
+                    'id': 'Q007',
+                    'section': 'Sponsor Information',
+                    'question': 'How long has your sponsor been a New Zealand resident?',
+                    'type': 'select',
+                    'required': True,
+                    'options': ['12-24 months', '2-5 years', '5+ years'],
+                    'help_text': 'Sponsor must be resident for at least 12 months'
+                },
+                {
+                    'id': 'Q008',
+                    'section': 'Visit Details',
+                    'question': 'What is the main purpose of your visit?',
+                    'type': 'select',
+                    'required': True,
+                    'options': ['Visit family', 'Tourism', 'Medical treatment', 'Other'],
+                    'help_text': 'Select the primary reason for your visit to New Zealand'
+                },
+                {
+                    'id': 'Q009',
+                    'section': 'Visit Details',
+                    'question': 'How long do you intend to stay in New Zealand?',
+                    'type': 'select',
+                    'required': True,
+                    'options': ['1-3 months', '3-6 months', '6-12 months', '12-18 months'],
+                    'help_text': 'Maximum stay is 18 months for this visa type'
+                },
+                {
+                    'id': 'Q010',
+                    'section': 'Financial Support',
+                    'question': 'Who will be financially supporting your visit?',
+                    'type': 'radio',
+                    'required': True,
+                    'options': ['Sponsor (child)', 'Self-funded', 'Combination'],
+                    'help_text': 'Indicate who will cover your expenses during the visit'
+                },
+                {
+                    'id': 'Q011',
+                    'section': 'Financial Support',
+                    'question': 'What is your sponsor\'s annual income (NZD)?',
+                    'type': 'number',
+                    'required': True,
+                    'validation_rules': ['Must be positive number', 'Minimum threshold applies'],
+                    'help_text': 'Enter sponsor\'s gross annual income in New Zealand dollars'
+                },
+                {
+                    'id': 'Q012',
+                    'section': 'Health and Character',
+                    'question': 'Do you have any serious medical conditions?',
+                    'type': 'radio',
+                    'required': True,
+                    'options': ['Yes', 'No'],
+                    'help_text': 'Declare any medical conditions that may require treatment'
+                }
+            ]
+        },
+        'validation': {
+            'overall_score': 87,
+            'component_scores': {
+                'requirements_quality': 85,
+                'questions_quality': 88,
+                'coverage_completeness': 89
+            },
+            'validation_report': {
+                'strengths': [
+                    'Comprehensive requirement coverage',
+                    'Clear question formulation',
+                    'Appropriate validation rules'
+                ],
+                'areas_for_improvement': [
+                    'Consider additional financial verification questions',
+                    'Add more detailed health assessment questions'
+                ],
+                'recommendations': [
+                    'Review question ordering for better user flow',
+                    'Add conditional logic for age-specific requirements'
+                ]
+            }
+        },
+        'consolidation': {
+            'status': 'completed',
+            'summary': 'Parent Boost Visitor Visa application process successfully analyzed and structured',
+            'total_requirements': 20,
+            'total_questions': 12,
+            'processing_time': 2.1,
+            'quality_score': 87
+        }
+    }
