@@ -17,20 +17,32 @@ def show_human_validation_workflow(workflow_results: Dict[str, Any]):
     st.title("👥 Human-in-the-Loop Validation Workflow")
     st.markdown("**Review, validate, and improve generated requirements and questions before finalizing the visa application process.**")
     
-    if not workflow_results:
-        st.warning("⚠️ No workflow results available. Please run the main workflow first.")
-        st.markdown("### 🚀 Quick Start")
-        st.markdown("1. Navigate to **Workflow Analysis** tab")
-        st.markdown("2. Upload the Parent Boost Visitor Visa policy document")
-        st.markdown("3. Click **Run Complete Workflow** (demo mode)")
-        st.markdown("4. Return here to start the validation process")
-        
-        # Provide demo data button for testing
-        if st.button("🎭 Load Demo Data for Testing", type="primary"):
+    # Debug info
+    st.success("✅ Function called successfully!")
+    st.info(f"Workflow results available: {workflow_results is not None}")
+    
+    # Always show the demo data button first
+    st.markdown("### 🎭 Demo Data")
+    if st.button("🚀 Load Demo Data for Testing", type="primary", key="load_demo_data"):
+        try:
             st.session_state.workflow_results = generate_demo_workflow_results()
             st.success("✅ Demo data loaded! Validation workflow is now available.")
+            st.balloons()
             st.rerun()
+        except Exception as e:
+            st.error(f"Error loading demo data: {e}")
+    
+    # Show content based on workflow results
+    if not workflow_results:
+        st.warning("⚠️ No workflow results available. Please load demo data or run the main workflow first.")
+        st.markdown("### 🚀 Quick Start Options")
+        st.markdown("**Option 1:** Click the 'Load Demo Data for Testing' button above")
+        st.markdown("**Option 2:** Navigate to **Workflow Analysis** → Upload document → Run workflow")
         return
+    
+    # If we have workflow results, show success message
+    st.success("🎉 Workflow results loaded! Validation workflow ready.")
+    st.markdown("**Next:** The validation workflow content would appear here.")
     
     # Initialize session state for validation workflow
     if 'validation_state' not in st.session_state:

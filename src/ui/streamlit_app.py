@@ -766,11 +766,21 @@ elif st.session_state.current_page == "Agent Performance":
 
 elif st.session_state.current_page == "Human Validation":
     # Human-in-the-Loop Validation Workflow
-    if st.session_state.workflow_results:
+    st.markdown("## 🔍 Debug: Human Validation Page Loaded")
+    st.markdown(f"**Current page:** {st.session_state.current_page}")
+    st.markdown(f"**Workflow results:** {st.session_state.workflow_results is not None}")
+    
+    # Always show the validation workflow - it handles empty state internally
+    try:
+        st.markdown("**Calling show_human_validation_workflow...**")
         show_human_validation_workflow(st.session_state.workflow_results)
-    else:
-        st.info("🔄 Run a workflow first to access the validation workflow")
-        st.markdown("Navigate to **Workflow Analysis** and run the complete workflow to generate data for validation.")
+        st.markdown("**Function call completed successfully**")
+    except Exception as e:
+        st.error(f"Error loading Human Validation: {str(e)}")
+        st.markdown("**Debug Info:**")
+        st.code(f"Error: {e}")
+        import traceback
+        st.code(traceback.format_exc())
 
 elif st.session_state.current_page == "Customer Form":
     # Customer Form Renderer
