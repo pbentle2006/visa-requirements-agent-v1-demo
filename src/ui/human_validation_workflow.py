@@ -71,7 +71,7 @@ def show_validation_progress():
             elif i == current_step:
                 st.info(f"🔄 {step}")
             else:
-                st.secondary(f"⏳ {step}")
+                st.write(f"⏳ {step}")
     
     st.divider()
 
