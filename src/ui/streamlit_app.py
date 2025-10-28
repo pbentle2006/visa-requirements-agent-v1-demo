@@ -20,6 +20,7 @@ from src.generators.policy_generator import PolicyGenerator
 from src.ui.enhanced_file_upload import show_enhanced_file_upload, get_document_content, get_document_path
 from src.ui.agent_dashboard import show_agent_performance_dashboard
 from src.ui.enhanced_policy_comparison import show_enhanced_policy_comparison
+from src.ui.pages.agent_architecture import show_agent_architecture
 
 # Page configuration
 st.set_page_config(
@@ -91,19 +92,34 @@ with st.sidebar:
     # Navigation options
     page_options = [
         "🚀 Workflow Analysis",
+        "🏗️ Agent Architecture", 
+        "📈 Agent Performance",
         "📊 Policy Comparison"
     ]
+    
+    # Determine current index
+    current_index = 0
+    if st.session_state.current_page == "Agent Architecture":
+        current_index = 1
+    elif st.session_state.current_page == "Agent Performance":
+        current_index = 2
+    elif st.session_state.current_page == "Policy Comparison":
+        current_index = 3
     
     selected_page = st.radio(
         "Choose functionality:",
         page_options,
-        index=0 if st.session_state.current_page == "Workflow Analysis" else 1,
+        index=current_index,
         key="navigation_radio"
     )
     
     # Update session state
     if "Workflow Analysis" in selected_page:
         st.session_state.current_page = "Workflow Analysis"
+    elif "Agent Architecture" in selected_page:
+        st.session_state.current_page = "Agent Architecture"
+    elif "Agent Performance" in selected_page:
+        st.session_state.current_page = "Agent Performance"
     elif "Policy Comparison" in selected_page:
         st.session_state.current_page = "Policy Comparison"
     
@@ -723,6 +739,18 @@ if st.session_state.current_page == "Workflow Analysis":
             st.session_state.workflow_results = None
             st.session_state.document_info = None
             st.rerun()
+
+elif st.session_state.current_page == "Agent Architecture":
+    # Agent Architecture Page
+    show_agent_architecture()
+
+elif st.session_state.current_page == "Agent Performance":
+    # Agent Performance Dashboard
+    if st.session_state.workflow_results:
+        show_agent_performance_dashboard(st.session_state.workflow_results)
+    else:
+        st.info("🔄 Run a workflow first to see agent performance metrics")
+        st.markdown("Navigate to **Workflow Analysis** and run the complete workflow to generate performance data.")
 
 elif st.session_state.current_page == "Policy Comparison":
     # Policy Comparison Page
