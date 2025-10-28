@@ -21,10 +21,12 @@ from src.ui.enhanced_file_upload import show_enhanced_file_upload, get_document_
 from src.ui.agent_dashboard import show_agent_performance_dashboard
 from src.ui.enhanced_policy_comparison import show_enhanced_policy_comparison
 from src.ui.pages.agent_architecture import show_agent_architecture
+from src.ui.human_validation_workflow import show_human_validation_workflow
+from src.ui.customer_form_renderer import show_customer_form_renderer
 
 # Page configuration
 st.set_page_config(
-    page_title="Visa Requirements Agent Demo",
+    page_title="Visa Requirements Agent V1.2 - Human-in-the-Loop Demo",
     page_icon="🛂",
     layout="wide",
     initial_sidebar_state="expanded"
@@ -73,9 +75,9 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
-# Main header
-st.markdown('<div class="main-header">🛂 Visa Requirements Agent Demo</div>', unsafe_allow_html=True)
-st.markdown('<div class="sub-header">Automated Requirements Capture for Immigration Policies</div>', unsafe_allow_html=True)
+# Main title and description
+st.markdown('<h1 class="main-header">🛂 Visa Requirements Agent V1.2</h1>', unsafe_allow_html=True)
+st.markdown("**Human-in-the-Loop Demo: Advanced workflow with validation capabilities and customer form generation.**")
 
 # Initialize session state
 if 'workflow_results' not in st.session_state:
@@ -94,6 +96,8 @@ with st.sidebar:
         "🚀 Workflow Analysis",
         "🏗️ Agent Architecture", 
         "📈 Agent Performance",
+        "👥 Human Validation",
+        "📋 Customer Form",
         "📊 Policy Comparison"
     ]
     
@@ -103,8 +107,12 @@ with st.sidebar:
         current_index = 1
     elif st.session_state.current_page == "Agent Performance":
         current_index = 2
-    elif st.session_state.current_page == "Policy Comparison":
+    elif st.session_state.current_page == "Human Validation":
         current_index = 3
+    elif st.session_state.current_page == "Customer Form":
+        current_index = 4
+    elif st.session_state.current_page == "Policy Comparison":
+        current_index = 5
     
     selected_page = st.radio(
         "Choose functionality:",
@@ -120,6 +128,10 @@ with st.sidebar:
         st.session_state.current_page = "Agent Architecture"
     elif "Agent Performance" in selected_page:
         st.session_state.current_page = "Agent Performance"
+    elif "Human Validation" in selected_page:
+        st.session_state.current_page = "Human Validation"
+    elif "Customer Form" in selected_page:
+        st.session_state.current_page = "Customer Form"
     elif "Policy Comparison" in selected_page:
         st.session_state.current_page = "Policy Comparison"
     
@@ -751,6 +763,24 @@ elif st.session_state.current_page == "Agent Performance":
     else:
         st.info("🔄 Run a workflow first to see agent performance metrics")
         st.markdown("Navigate to **Workflow Analysis** and run the complete workflow to generate performance data.")
+
+elif st.session_state.current_page == "Human Validation":
+    # Human-in-the-Loop Validation Workflow
+    if st.session_state.workflow_results:
+        show_human_validation_workflow(st.session_state.workflow_results)
+    else:
+        st.info("🔄 Run a workflow first to access the validation workflow")
+        st.markdown("Navigate to **Workflow Analysis** and run the complete workflow to generate data for validation.")
+
+elif st.session_state.current_page == "Customer Form":
+    # Customer Form Renderer
+    if st.session_state.workflow_results:
+        show_customer_form_renderer(st.session_state.workflow_results)
+    else:
+        st.info("🔄 Complete the workflow and validation process first")
+        st.markdown("1. Navigate to **Workflow Analysis** and run the workflow")
+        st.markdown("2. Complete the **Human Validation** process")
+        st.markdown("3. Return here to generate the customer form")
 
 elif st.session_state.current_page == "Policy Comparison":
     # Policy Comparison Page
