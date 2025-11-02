@@ -1,6 +1,9 @@
 from typing import Dict, Any, List
 import time
 import logging
+import json
+import os
+from openai import OpenAI
 from .base_agent import BaseAgent
 
 logger = logging.getLogger(__name__)
@@ -37,26 +40,54 @@ class QuestionGeneratorAgent(BaseAgent):
             
             print(f"QUESTION GENERATOR: Requirements counts - functional={len(functional_requirements)}, data={len(data_requirements)}, business={len(business_rules)}, validation={len(validation_rules)}", flush=True)
             
-            # Generate questions for different sections using LLM
-            applicant_questions = self._generate_applicant_questions(
-                data_requirements, validation_rules
-            )
+            # Check if we should force real LLM calls (V2 mode)
+            import os
+            force_llm = os.getenv('VISA_AGENT_FORCE_LLM', 'false').lower() == 'true'
             
-            sponsor_questions = self._generate_sponsor_questions(
-                data_requirements, business_rules, validation_rules
-            )
-            
-            dependent_questions = self._generate_dependent_questions(
-                data_requirements, validation_rules
-            )
-            
-            financial_questions = self._generate_financial_questions(
-                data_requirements, business_rules, validation_rules
-            )
-            
-            health_character_questions = self._generate_health_character_questions(
-                data_requirements, validation_rules
-            )
+            if force_llm:
+                print("QUESTION GENERATOR: V2 MODE - Using real LLM calls", flush=True)
+                # Generate questions for different sections using real LLM
+                applicant_questions = self._generate_applicant_questions_llm(
+                    data_requirements, validation_rules
+                )
+                
+                sponsor_questions = self._generate_sponsor_questions_llm(
+                    data_requirements, business_rules, validation_rules
+                )
+                
+                dependent_questions = self._generate_dependent_questions_llm(
+                    data_requirements, validation_rules
+                )
+                
+                financial_questions = self._generate_financial_questions_llm(
+                    data_requirements, business_rules, validation_rules
+                )
+                
+                health_character_questions = self._generate_health_character_questions_llm(
+                    data_requirements, validation_rules
+                )
+            else:
+                print("QUESTION GENERATOR: V1 MODE - Using fallback questions", flush=True)
+                # Generate questions for different sections using LLM (fallback)
+                applicant_questions = self._generate_applicant_questions(
+                    data_requirements, validation_rules
+                )
+                
+                sponsor_questions = self._generate_sponsor_questions(
+                    data_requirements, business_rules, validation_rules
+                )
+                
+                dependent_questions = self._generate_dependent_questions(
+                    data_requirements, validation_rules
+                )
+                
+                financial_questions = self._generate_financial_questions(
+                    data_requirements, business_rules, validation_rules
+                )
+                
+                health_character_questions = self._generate_health_character_questions(
+                    data_requirements, validation_rules
+                )
             
             # Combine all questions
             all_questions = (
@@ -76,14 +107,15 @@ class QuestionGeneratorAgent(BaseAgent):
             # Add timestamp proof of execution
             import datetime
             execution_timestamp = datetime.datetime.now().isoformat()
+            execution_mode = 'REAL_LLM_EXECUTION' if force_llm else 'FALLBACK_EXECUTION'
             
             outputs = {
                 'application_questions': all_questions,
                 'conditional_logic': conditional_logic,
                 'question_count': len(all_questions),
-                'debug_info': f"QuestionGenerator: Generated {len(all_questions)} questions at {execution_timestamp}",
+                'debug_info': f"QuestionGenerator: Generated {len(all_questions)} questions via {execution_mode} at {execution_timestamp}",
                 'execution_timestamp': execution_timestamp,
-                'execution_mode': 'REAL_AGENT_EXECUTION'
+                'execution_mode': execution_mode
             }
             
             outputs = self._add_metadata(outputs)
@@ -513,3 +545,206 @@ Return ONLY valid JSON, no other text."""
                 "affects": ["Q_FINA_001"]
             }
         }
+    
+    # =============================================================================
+    # REAL LLM METHODS FOR VERSION 2 (Live API)
+    # =============================================================================
+    
+    def _get_openai_client(self):
+        """Get OpenAI client with API key."""
+        api_key = os.getenv('OPENAI_API_KEY')
+        if not api_key:
+            raise ValueError("OpenAI API key not found. Please set OPENAI_API_KEY environment variable.")
+        return OpenAI(api_key=api_key)
+    
+    def _generate_applicant_questions_llm(self, data_requirements: List[Dict], validation_rules: List[Dict]) -> List[Dict[str, Any]]:
+        """Generate applicant questions using real LLM calls."""
+        try:
+            client = self._get_openai_client()
+            
+            prompt = f"""
+You are an expert in immigration policy and form design. Generate 4 application form questions for the "Applicant Details" section of a visa application.
+
+Data Requirements: {json.dumps(data_requirements[:3], indent=2)}
+Validation Rules: {json.dumps(validation_rules[:3], indent=2)}
+
+Generate questions that capture essential applicant information. Each question must be a JSON object with these exact fields:
+- question_id: String (format: Q_APPL_XXX)
+- section: "Applicant Details"
+- question_text: Clear, professional question text
+- input_type: One of ["text", "email", "date", "select", "boolean", "number"]
+- required: Boolean
+- validation: Object with "rules" array and "error_messages" object
+- help_text: Brief helpful guidance
+- policy_reference: Reference to policy section (e.g., "V4.1")
+
+Return ONLY a valid JSON array of 4 question objects, no other text.
+"""
+
+            response = client.chat.completions.create(
+                model="gpt-4",
+                messages=[{"role": "user", "content": prompt}],
+                temperature=0.7,
+                max_tokens=2000
+            )
+            
+            result = json.loads(response.choices[0].message.content.strip())
+            print(f"LLM APPLICANT QUESTIONS: Generated {len(result)} questions", flush=True)
+            return result
+            
+        except Exception as e:
+            print(f"LLM ERROR in applicant questions: {e}, falling back", flush=True)
+            return self._generate_fallback_applicant_questions()
+    
+    def _generate_sponsor_questions_llm(self, data_requirements: List[Dict], business_rules: List[Dict], validation_rules: List[Dict]) -> List[Dict[str, Any]]:
+        """Generate sponsor questions using real LLM calls."""
+        try:
+            client = self._get_openai_client()
+            
+            prompt = f"""
+You are an expert in immigration policy and form design. Generate 3 application form questions for the "Sponsorship" section of a visa application.
+
+Data Requirements: {json.dumps(data_requirements[:3], indent=2)}
+Business Rules: {json.dumps(business_rules[:3], indent=2)}
+
+Generate questions about sponsors, guarantors, and supporting parties. Each question must be a JSON object with these exact fields:
+- question_id: String (format: Q_SPON_XXX)
+- section: "Sponsorship"
+- question_text: Clear, professional question text
+- input_type: One of ["text", "email", "date", "select", "boolean", "number"]
+- required: Boolean
+- validation: Object with "rules" array and "error_messages" object
+- help_text: Brief helpful guidance
+- policy_reference: Reference to policy section (e.g., "V4.2")
+
+Return ONLY a valid JSON array of 3 question objects, no other text.
+"""
+
+            response = client.chat.completions.create(
+                model="gpt-4",
+                messages=[{"role": "user", "content": prompt}],
+                temperature=0.7,
+                max_tokens=1500
+            )
+            
+            result = json.loads(response.choices[0].message.content.strip())
+            print(f"LLM SPONSOR QUESTIONS: Generated {len(result)} questions", flush=True)
+            return result
+            
+        except Exception as e:
+            print(f"LLM ERROR in sponsor questions: {e}, falling back", flush=True)
+            return self._generate_fallback_sponsor_questions()
+    
+    def _generate_dependent_questions_llm(self, data_requirements: List[Dict], validation_rules: List[Dict]) -> List[Dict[str, Any]]:
+        """Generate dependent questions using real LLM calls."""
+        try:
+            client = self._get_openai_client()
+            
+            prompt = f"""
+You are an expert in immigration policy and form design. Generate 2 application form questions for the "Dependent Children" section of a visa application.
+
+Data Requirements: {json.dumps(data_requirements[:2], indent=2)}
+
+Generate questions about dependent children accompanying the applicant. Each question must be a JSON object with these exact fields:
+- question_id: String (format: Q_DEPE_XXX)
+- section: "Dependent Children"
+- question_text: Clear, professional question text
+- input_type: One of ["text", "email", "date", "select", "boolean", "number"]
+- required: Boolean
+- validation: Object with "rules" array and "error_messages" object
+- help_text: Brief helpful guidance
+- policy_reference: Reference to policy section (e.g., "V4.3")
+
+Return ONLY a valid JSON array of 2 question objects, no other text.
+"""
+
+            response = client.chat.completions.create(
+                model="gpt-4",
+                messages=[{"role": "user", "content": prompt}],
+                temperature=0.7,
+                max_tokens=1000
+            )
+            
+            result = json.loads(response.choices[0].message.content.strip())
+            print(f"LLM DEPENDENT QUESTIONS: Generated {len(result)} questions", flush=True)
+            return result
+            
+        except Exception as e:
+            print(f"LLM ERROR in dependent questions: {e}, falling back", flush=True)
+            return self._generate_fallback_dependent_questions()
+    
+    def _generate_financial_questions_llm(self, data_requirements: List[Dict], business_rules: List[Dict], validation_rules: List[Dict]) -> List[Dict[str, Any]]:
+        """Generate financial questions using real LLM calls."""
+        try:
+            client = self._get_openai_client()
+            
+            prompt = f"""
+You are an expert in immigration policy and form design. Generate 2 application form questions for the "Financial" section of a visa application.
+
+Business Rules: {json.dumps(business_rules[:2], indent=2)}
+
+Generate questions about financial capacity, funds, and financial requirements. Each question must be a JSON object with these exact fields:
+- question_id: String (format: Q_FINA_XXX)
+- section: "Financial"
+- question_text: Clear, professional question text
+- input_type: One of ["text", "email", "date", "select", "boolean", "number", "currency"]
+- required: Boolean
+- validation: Object with "rules" array and "error_messages" object
+- help_text: Brief helpful guidance
+- policy_reference: Reference to policy section (e.g., "V4.4")
+
+Return ONLY a valid JSON array of 2 question objects, no other text.
+"""
+
+            response = client.chat.completions.create(
+                model="gpt-4",
+                messages=[{"role": "user", "content": prompt}],
+                temperature=0.7,
+                max_tokens=1000
+            )
+            
+            result = json.loads(response.choices[0].message.content.strip())
+            print(f"LLM FINANCIAL QUESTIONS: Generated {len(result)} questions", flush=True)
+            return result
+            
+        except Exception as e:
+            print(f"LLM ERROR in financial questions: {e}, falling back", flush=True)
+            return self._generate_fallback_financial_questions()
+    
+    def _generate_health_character_questions_llm(self, data_requirements: List[Dict], validation_rules: List[Dict]) -> List[Dict[str, Any]]:
+        """Generate health and character questions using real LLM calls."""
+        try:
+            client = self._get_openai_client()
+            
+            prompt = f"""
+You are an expert in immigration policy and form design. Generate 2 application form questions for the "Health & Character" section of a visa application.
+
+Validation Rules: {json.dumps(validation_rules[:2], indent=2)}
+
+Generate questions about health requirements and character assessments. Each question must be a JSON object with these exact fields:
+- question_id: String (format: Q_HEAL_XXX)
+- section: "Health & Character"
+- question_text: Clear, professional question text
+- input_type: One of ["text", "email", "date", "select", "boolean", "number"]
+- required: Boolean
+- validation: Object with "rules" array and "error_messages" object
+- help_text: Brief helpful guidance
+- policy_reference: Reference to policy section (e.g., "V4.5")
+
+Return ONLY a valid JSON array of 2 question objects, no other text.
+"""
+
+            response = client.chat.completions.create(
+                model="gpt-4",
+                messages=[{"role": "user", "content": prompt}],
+                temperature=0.7,
+                max_tokens=1000
+            )
+            
+            result = json.loads(response.choices[0].message.content.strip())
+            print(f"LLM HEALTH QUESTIONS: Generated {len(result)} questions", flush=True)
+            return result
+            
+        except Exception as e:
+            print(f"LLM ERROR in health questions: {e}, falling back", flush=True)
+            return self._generate_fallback_health_character_questions()

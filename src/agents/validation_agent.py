@@ -1,6 +1,9 @@
 from typing import Dict, Any, List
 import time
 import logging
+import json
+import os
+from openai import OpenAI
 from .base_agent import BaseAgent
 from ..utils.validator import Validator
 
@@ -47,12 +50,25 @@ class ValidationAgent(BaseAgent):
             
             print(f" VALIDATION AGENT: Final counts after fallback - requirements={len(requirements)}, questions={len(questions)} ", flush=True)
             
-            # Perform validations
-            requirement_validation = self._validate_requirements(requirements)
-            question_validation = self._validate_questions(questions)
-            coverage_analysis = self._analyze_coverage(requirements, questions, sections)
-            consistency_check = self._check_consistency(requirements, questions, policy_structure)
-            gap_analysis = self._identify_gaps(requirements, questions, sections)
+            # Check if we should use real LLM calls (V2 mode)
+            force_llm = os.getenv('VISA_AGENT_FORCE_LLM', 'false').lower() == 'true'
+            
+            if force_llm:
+                print("VALIDATION AGENT: V2 MODE - Using real LLM validation", flush=True)
+                # Perform validations with real LLM
+                requirement_validation = self._validate_requirements_llm(requirements)
+                question_validation = self._validate_questions_llm(questions)
+                coverage_analysis = self._analyze_coverage_llm(requirements, questions, sections)
+                consistency_check = self._check_consistency_llm(requirements, questions, policy_structure)
+                gap_analysis = self._identify_gaps_llm(requirements, questions, sections)
+            else:
+                print("VALIDATION AGENT: V1 MODE - Using fallback validation", flush=True)
+                # Perform validations with fallback methods
+                requirement_validation = self._validate_requirements(requirements)
+                question_validation = self._validate_questions(questions)
+                coverage_analysis = self._analyze_coverage(requirements, questions, sections)
+                consistency_check = self._check_consistency(requirements, questions, policy_structure)
+                gap_analysis = self._identify_gaps(requirements, questions, sections)
             
             # Generate recommendations
             recommendations = self._generate_recommendations(
@@ -452,3 +468,250 @@ class ValidationAgent(BaseAgent):
                 'policy_reference': 'V4.6'
             }
         ]
+    
+    # =============================================================================
+    # REAL LLM METHODS FOR VERSION 2 (Live API)
+    # =============================================================================
+    
+    def _get_openai_client(self):
+        """Get OpenAI client with API key."""
+        api_key = os.getenv('OPENAI_API_KEY')
+        if not api_key:
+            raise ValueError("OpenAI API key not found. Please set OPENAI_API_KEY environment variable.")
+        return OpenAI(api_key=api_key)
+    
+    def _validate_requirements_llm(self, requirements: List[Dict[str, Any]]) -> Dict[str, Any]:
+        """Validate requirements using real LLM calls."""
+        try:
+            client = self._get_openai_client()
+            
+            prompt = f"""
+You are an expert immigration policy validator. Analyze these requirements for completeness, clarity, and policy compliance.
+
+Requirements to validate:
+{json.dumps(requirements[:10], indent=2)}
+
+For each requirement, assess:
+1. Completeness: Does it have all necessary fields?
+2. Clarity: Is it clearly written and unambiguous?
+3. Policy compliance: Does it align with immigration policy standards?
+4. Technical validity: Are validation rules appropriate?
+
+Return validation results as JSON:
+{{
+    "total_requirements": {len(requirements)},
+    "valid_requirements": <number_of_valid_requirements>,
+    "invalid_requirements": <number_of_invalid_requirements>,
+    "validation_rate": <percentage_valid>,
+    "errors": [
+        {{"requirement_id": "ID", "errors": ["Error description"]}}
+    ],
+    "quality_score": <0-100_overall_quality>,
+    "recommendations": ["Improvement suggestion 1", "Improvement suggestion 2"]
+}}
+
+Return ONLY valid JSON, no other text.
+"""
+
+            response = client.chat.completions.create(
+                model="gpt-4",
+                messages=[{"role": "user", "content": prompt}],
+                temperature=0.2,
+                max_tokens=1500
+            )
+            
+            result = json.loads(response.choices[0].message.content.strip())
+            print(f"LLM REQUIREMENTS VALIDATION: {result['valid_requirements']}/{result['total_requirements']} valid ({result['validation_rate']:.1f}%)", flush=True)
+            return result
+            
+        except Exception as e:
+            print(f"LLM ERROR in requirements validation: {e}, falling back", flush=True)
+            return self._validate_requirements(requirements)
+    
+    def _validate_questions_llm(self, questions: List[Dict[str, Any]]) -> Dict[str, Any]:
+        """Validate questions using real LLM calls."""
+        try:
+            client = self._get_openai_client()
+            
+            prompt = f"""
+You are an expert form design validator. Analyze these application form questions for usability, completeness, and effectiveness.
+
+Questions to validate:
+{json.dumps(questions[:10], indent=2)}
+
+For each question, assess:
+1. Clarity: Is the question clear and unambiguous?
+2. Completeness: Does it have proper validation rules and help text?
+3. User experience: Is it user-friendly and accessible?
+4. Data quality: Will it collect high-quality, useful data?
+
+Return validation results as JSON:
+{{
+    "total_questions": {len(questions)},
+    "valid_questions": <number_of_valid_questions>,
+    "invalid_questions": <number_of_invalid_questions>,
+    "validation_rate": <percentage_valid>,
+    "errors": [
+        {{"question_id": "ID", "errors": ["Error description"]}}
+    ],
+    "usability_score": <0-100_usability_rating>,
+    "recommendations": ["Improvement suggestion 1", "Improvement suggestion 2"]
+}}
+
+Return ONLY valid JSON, no other text.
+"""
+
+            response = client.chat.completions.create(
+                model="gpt-4",
+                messages=[{"role": "user", "content": prompt}],
+                temperature=0.2,
+                max_tokens=1500
+            )
+            
+            result = json.loads(response.choices[0].message.content.strip())
+            print(f"LLM QUESTIONS VALIDATION: {result['valid_questions']}/{result['total_questions']} valid ({result['validation_rate']:.1f}%)", flush=True)
+            return result
+            
+        except Exception as e:
+            print(f"LLM ERROR in questions validation: {e}, falling back", flush=True)
+            return self._validate_questions(questions)
+    
+    def _analyze_coverage_llm(self, requirements: List[Dict], questions: List[Dict], sections: List[Dict]) -> Dict[str, Any]:
+        """Analyze coverage using real LLM calls."""
+        try:
+            client = self._get_openai_client()
+            
+            prompt = f"""
+You are an expert policy analyst. Analyze how well these application questions cover the policy requirements.
+
+Requirements ({len(requirements)} total):
+{json.dumps(requirements[:5], indent=2)}
+
+Questions ({len(questions)} total):
+{json.dumps(questions[:5], indent=2)}
+
+Analyze coverage and return as JSON:
+{{
+    "coverage_percentage": <0-100_percentage>,
+    "covered_requirements": <number_covered>,
+    "uncovered_requirements": <number_uncovered>,
+    "question_coverage": {{
+        "Applicant Details": <percentage>,
+        "Sponsorship": <percentage>,
+        "Financial": <percentage>,
+        "Health & Character": <percentage>
+    }},
+    "gaps": ["Gap description 1", "Gap description 2"],
+    "recommendations": ["Recommendation 1", "Recommendation 2"]
+}}
+
+Return ONLY valid JSON, no other text.
+"""
+
+            response = client.chat.completions.create(
+                model="gpt-4",
+                messages=[{"role": "user", "content": prompt}],
+                temperature=0.2,
+                max_tokens=1500
+            )
+            
+            result = json.loads(response.choices[0].message.content.strip())
+            print(f"LLM COVERAGE ANALYSIS: {result['coverage_percentage']:.1f}% coverage, {len(result.get('gaps', []))} gaps identified", flush=True)
+            return result
+            
+        except Exception as e:
+            print(f"LLM ERROR in coverage analysis: {e}, falling back", flush=True)
+            return self._analyze_coverage(requirements, questions, sections)
+    
+    def _check_consistency_llm(self, requirements: List[Dict], questions: List[Dict], policy_structure: Dict) -> Dict[str, Any]:
+        """Check consistency using real LLM calls."""
+        try:
+            client = self._get_openai_client()
+            
+            prompt = f"""
+You are an expert policy consistency checker. Analyze consistency between policy structure, requirements, and questions.
+
+Policy Structure:
+{json.dumps(policy_structure, indent=2)}
+
+Requirements (sample):
+{json.dumps(requirements[:3], indent=2)}
+
+Questions (sample):
+{json.dumps(questions[:3], indent=2)}
+
+Check for consistency and return as JSON:
+{{
+    "consistency_score": <0-100_percentage>,
+    "policy_alignment": <0-100_percentage>,
+    "requirement_alignment": <0-100_percentage>,
+    "inconsistencies": [
+        {{"type": "type", "description": "Description", "severity": "high|medium|low"}}
+    ],
+    "recommendations": ["Fix suggestion 1", "Fix suggestion 2"]
+}}
+
+Return ONLY valid JSON, no other text.
+"""
+
+            response = client.chat.completions.create(
+                model="gpt-4",
+                messages=[{"role": "user", "content": prompt}],
+                temperature=0.2,
+                max_tokens=1500
+            )
+            
+            result = json.loads(response.choices[0].message.content.strip())
+            print(f"LLM CONSISTENCY CHECK: {result['consistency_score']:.1f}% consistent, {len(result.get('inconsistencies', []))} issues found", flush=True)
+            return result
+            
+        except Exception as e:
+            print(f"LLM ERROR in consistency check: {e}, falling back", flush=True)
+            return self._check_consistency(requirements, questions, policy_structure)
+    
+    def _identify_gaps_llm(self, requirements: List[Dict], questions: List[Dict], sections: List[Dict]) -> Dict[str, Any]:
+        """Identify gaps using real LLM calls."""
+        try:
+            client = self._get_openai_client()
+            
+            prompt = f"""
+You are an expert gap analysis specialist. Identify missing elements between requirements and questions.
+
+Requirements:
+{json.dumps(requirements[:5], indent=2)}
+
+Questions:
+{json.dumps(questions[:5], indent=2)}
+
+Identify gaps and return as JSON:
+{{
+    "missing_questions": [
+        {{"requirement_id": "ID", "description": "Missing question for X", "priority": "high|medium|low"}}
+    ],
+    "missing_requirements": [
+        {{"area": "Area name", "description": "Missing requirement for Y", "priority": "high|medium|low"}}
+    ],
+    "improvement_opportunities": [
+        {{"area": "Area", "description": "Improvement description", "impact": "high|medium|low"}}
+    ],
+    "overall_completeness": <0-100_percentage>
+}}
+
+Return ONLY valid JSON, no other text.
+"""
+
+            response = client.chat.completions.create(
+                model="gpt-4",
+                messages=[{"role": "user", "content": prompt}],
+                temperature=0.2,
+                max_tokens=1500
+            )
+            
+            result = json.loads(response.choices[0].message.content.strip())
+            total_gaps = len(result.get('missing_questions', [])) + len(result.get('missing_requirements', []))
+            print(f"LLM GAP ANALYSIS: {total_gaps} gaps identified, {result['overall_completeness']:.1f}% complete", flush=True)
+            return result
+            
+        except Exception as e:
+            print(f"LLM ERROR in gap analysis: {e}, falling back", flush=True)
+            return self._identify_gaps(requirements, questions, sections)

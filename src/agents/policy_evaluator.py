@@ -2,6 +2,8 @@ from typing import Dict, Any
 import time
 import json
 import logging
+import os
+from openai import OpenAI
 from .base_agent import BaseAgent
 from ..utils.document_parser import DocumentParser
 
@@ -107,10 +109,22 @@ class PolicyEvaluatorAgent(BaseAgent):
             # Extract sections
             sections = DocumentParser.extract_sections(policy_text)
             
-            # Analyze with LLM
-            policy_structure = self._analyze_policy_structure(policy_text, sections)
-            eligibility_rules = self._extract_eligibility_rules(policy_text, sections)
-            conditions = self._extract_conditions(policy_text, sections)
+            # Check if we should use real LLM calls (V2 mode)
+            force_llm = os.getenv('VISA_AGENT_FORCE_LLM', 'false').lower() == 'true'
+            
+            if force_llm:
+                print("POLICY EVALUATOR: V2 MODE - Using real LLM calls", flush=True)
+                # Analyze with real LLM
+                policy_structure = self._analyze_policy_structure_llm(policy_text, sections, detected_visa_type, detected_visa_code, force_visa_type)
+                eligibility_rules = self._extract_eligibility_rules_llm(policy_text, sections)
+                conditions = self._extract_conditions_llm(policy_text, sections)
+            else:
+                print("POLICY EVALUATOR: V1 MODE - Using fallback analysis", flush=True)
+                # Analyze with fallback methods
+                policy_structure = self._analyze_policy_structure(policy_text, sections)
+                eligibility_rules = self._extract_eligibility_rules(policy_text, sections)
+                conditions = self._extract_conditions(policy_text, sections)
+            
             thresholds = DocumentParser.extract_thresholds(policy_text)
             
             outputs = {
@@ -619,3 +633,154 @@ Return ONLY valid JSON, no other text."""
                 }
             ]
         }
+    
+    # =============================================================================
+    # REAL LLM METHODS FOR VERSION 2 (Live API)
+    # =============================================================================
+    
+    def _get_openai_client(self):
+        """Get OpenAI client with API key."""
+        api_key = os.getenv('OPENAI_API_KEY')
+        if not api_key:
+            raise ValueError("OpenAI API key not found. Please set OPENAI_API_KEY environment variable.")
+        return OpenAI(api_key=api_key)
+    
+    def _analyze_policy_structure_llm(self, policy_text: str, sections: Dict[str, Any], detected_visa_type: str = None, detected_visa_code: str = None, force_visa_type: bool = False) -> Dict[str, Any]:
+        """Analyze policy structure using real LLM calls."""
+        try:
+            client = self._get_openai_client()
+            
+            # Use detected visa type if available
+            visa_hint = f"\nDetected Visa Type: {detected_visa_type} ({detected_visa_code})" if detected_visa_type else ""
+            
+            prompt = f"""
+You are an expert immigration policy analyst. Analyze this visa policy document and extract the core structure.
+
+Policy Document (first 3000 chars):
+{policy_text[:3000]}
+{visa_hint}
+
+Extract the following information and return as JSON:
+{{
+    "visa_type": "Full visa name",
+    "visa_code": "Official visa code (e.g., V4, SR1, etc.)",
+    "objectives": ["Primary purpose 1", "Primary purpose 2"],
+    "key_requirements": ["Requirement 1", "Requirement 2", "Requirement 3"],
+    "stakeholders": ["Applicant", "Sponsor", "Other parties involved"]
+}}
+
+Focus on identifying the specific visa type, its official code, main objectives, and key stakeholders involved.
+Return ONLY valid JSON, no other text.
+"""
+
+            response = client.chat.completions.create(
+                model="gpt-4",
+                messages=[{"role": "user", "content": prompt}],
+                temperature=0.3,
+                max_tokens=1500
+            )
+            
+            result = json.loads(response.choices[0].message.content.strip())
+            print(f"LLM POLICY STRUCTURE: Analyzed {result.get('visa_type', 'Unknown')} ({result.get('visa_code', 'Unknown')})", flush=True)
+            return result
+            
+        except Exception as e:
+            print(f"LLM ERROR in policy structure: {e}, falling back", flush=True)
+            return self._generate_fallback_policy_structure()
+    
+    def _extract_eligibility_rules_llm(self, policy_text: str, sections: Dict[str, Any]) -> Dict[str, Any]:
+        """Extract eligibility rules using real LLM calls."""
+        try:
+            client = self._get_openai_client()
+            
+            prompt = f"""
+You are an expert immigration policy analyst. Extract eligibility rules from this visa policy document.
+
+Policy Document (first 4000 chars):
+{policy_text[:4000]}
+
+Extract eligibility rules and return as JSON:
+{{
+    "applicant_requirements": [
+        {{"description": "Requirement text", "policy_reference": "Section ref", "type": "mandatory|optional"}}
+    ],
+    "sponsor_requirements": [
+        {{"description": "Requirement text", "policy_reference": "Section ref", "type": "mandatory|optional"}}
+    ],
+    "dependent_requirements": [
+        {{"description": "Requirement text", "policy_reference": "Section ref", "type": "mandatory|optional"}}
+    ],
+    "exclusions": [
+        {{"description": "Exclusion criteria", "policy_reference": "Section ref", "type": "mandatory"}}
+    ]
+}}
+
+Focus on who can apply, sponsor requirements, dependent eligibility, and exclusion criteria.
+Return ONLY valid JSON, no other text.
+"""
+
+            response = client.chat.completions.create(
+                model="gpt-4",
+                messages=[{"role": "user", "content": prompt}],
+                temperature=0.3,
+                max_tokens=2000
+            )
+            
+            result = json.loads(response.choices[0].message.content.strip())
+            total_rules = sum(len(rules) for rules in result.values() if isinstance(rules, list))
+            print(f"LLM ELIGIBILITY RULES: Extracted {total_rules} rules across {len(result)} categories", flush=True)
+            return result
+            
+        except Exception as e:
+            print(f"LLM ERROR in eligibility rules: {e}, falling back", flush=True)
+            return self._generate_fallback_eligibility_rules()
+    
+    def _extract_conditions_llm(self, policy_text: str, sections: Dict[str, Any]) -> Dict[str, Any]:
+        """Extract conditions using real LLM calls."""
+        try:
+            client = self._get_openai_client()
+            
+            prompt = f"""
+You are an expert immigration policy analyst. Extract visa conditions and requirements from this policy document.
+
+Policy Document (first 4000 chars):
+{policy_text[:4000]}
+
+Extract conditions and return as JSON:
+{{
+    "visa_conditions": [
+        {{"description": "Condition text", "policy_reference": "Section ref", "type": "mandatory|optional"}}
+    ],
+    "financial_conditions": [
+        {{"description": "Financial requirement", "policy_reference": "Section ref", "type": "mandatory|optional"}}
+    ],
+    "health_conditions": [
+        {{"description": "Health requirement", "policy_reference": "Section ref", "type": "mandatory|optional"}}
+    ],
+    "character_conditions": [
+        {{"description": "Character requirement", "policy_reference": "Section ref", "type": "mandatory|optional"}}
+    ],
+    "decline_reasons": [
+        {{"description": "Reason for decline", "policy_reference": "Section ref", "type": "mandatory"}}
+    ]
+}}
+
+Focus on visa conditions, financial requirements, health/character requirements, and decline reasons.
+Return ONLY valid JSON, no other text.
+"""
+
+            response = client.chat.completions.create(
+                model="gpt-4",
+                messages=[{"role": "user", "content": prompt}],
+                temperature=0.3,
+                max_tokens=2000
+            )
+            
+            result = json.loads(response.choices[0].message.content.strip())
+            total_conditions = sum(len(conditions) for conditions in result.values() if isinstance(conditions, list))
+            print(f"LLM CONDITIONS: Extracted {total_conditions} conditions across {len(result)} categories", flush=True)
+            return result
+            
+        except Exception as e:
+            print(f"LLM ERROR in conditions: {e}, falling back", flush=True)
+            return self._generate_fallback_conditions()
